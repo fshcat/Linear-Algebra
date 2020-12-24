@@ -21,9 +21,7 @@ mat random_mat(int n, int m, int b){
     mat rand_mat(n,vl(m));
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            rand_mat[i][j]=rand()%b;
-            if(rand()%2==0)
-                rand_mat[i][j]*=-1;
+            rand_mat[i][j]=(rand() % (2*b+1))-b;
         }
     }
     return rand_mat;
@@ -53,6 +51,21 @@ ll dot_prod(vl v1, vl v2){
     return sum;
 }
 
+vl const_times_mat(int c, vl v){
+    for(ll &i: v){
+        i*=c;
+    }
+    return v;
+}
+
+mat const_times_mat(int c, mat m){
+    for(vl &v: m){
+        v=const_times_mat(c,v);
+    }
+    return m;
+}
+
+
 vl mat_times_vector(mat m, vl v){
     int length = v.size();
     if(v.size()!=m[0].size())
@@ -63,6 +76,26 @@ vl mat_times_vector(mat m, vl v){
         retv[i]=dot_prod(m[i],v);
     }
     return retv;
+}
+
+mat mat_times_mat(mat m1, mat m2){
+    int height = m1.size();
+    int width = m2[0].size();
+    int length = m2.size();
+
+    if(length!=m1[0].size()){
+        throw "Multiplying matrices with mismatched dimensions";
+    }
+
+    mat ret_m(height,vl(width));
+    for(int i = 0; i < height; i++){
+        vl sum_row(width,0);
+        for(int j = 0; j < length; j++){
+            sum_row = sum_vecs(sum_row,const_times_mat(m1[i][j],m2[j]));
+        }
+        ret_m[i]=sum_row;
+    }
+    return ret_m;
 }
 
 void print_mat(mat m){
